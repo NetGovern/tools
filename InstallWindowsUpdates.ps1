@@ -22,27 +22,6 @@ param (
     [Parameter(ParameterSetName='Recurse',Mandatory=$true)][string]$adminPassword
 )
 
-function Get-NewVersion {
-    $updateScript = (Invoke-WebRequest -Uri 'https://bitbucket.netmail.com/projects/PUB/repos/tools/raw/InstallWindowsUpdates.ps1').Content -split "`n"
-    $revisionHealth = ($updateScript  | Select-String "revision =").count
-    if ( $revisionHealth -lt 1) {
-        Write-Log "Cannot find revision"
-        return -1
-    }
-    if ( $revisionHealth -gt 1) {
-        Write-Log "Found more than 1 revision, fix it before continuing"
-        return -1
-    }
-    if ( $revisionHealth -eq 1) {
-        $revisionToParse = ($updateScript  | Select-String "revision =").Line.trim().split('=')
-        if ($revisionToParse.Count -ne 2) {
-            Write-Log "Cannot parse revision number"
-            return -1
-        } else {
-            return $revisionToParse[1]
-        }
-    }
-}
 function Clear-Winlogon {
 
     $RegistryWinLogonPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
@@ -90,12 +69,7 @@ function Set-Reboot {
     Set-ItemProperty $RegistryRunPath -Name $RegistryRunKeyName -Value "$RunCommandLine" -type String
 }
 
-# The following line has to be updated with a > revision number if the script is updated in order for the autoupdate to work
-$revision = 1
 $logfilename = "$PSScriptRoot\WindowsUpdates-log$(get-date -f yyyyMMdd_HHmm).txt"
-
-Write-Log "Latest Revision #:"
-Write-Log (Get-NewVersion)
 
 $updatesDone = $false
 $reboot = $false
