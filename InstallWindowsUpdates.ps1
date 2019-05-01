@@ -80,7 +80,7 @@ $updatesDone = $false
 $reboot = $false
 
 Write-Log "Script started"
-$revision = 1
+$revision = 2
 Write-Log "Script revision number: $revision"
 Write-Log "Checking for available updates"
 Write-Log "Creating Update Session"
