@@ -34,7 +34,12 @@ function Clear-Winlogon {
     Set-ItemProperty $RegistryWinLogonPath "DefaultPassword" -Value "" -type String
     Set-ItemProperty $RegistryWinLogonPath "AutoLogonCount" -Value "0" -type DWord
 
-    Remove-ItemProperty -Name $RegistryRunKeyName -Path $RegistryRunPath
+    if (Test-Path -Path $RegistryRunPath) {
+        $keyProperties = Get-ItemProperty -Path $RegistryRunPath
+        if (Get-Member -InputObject $keyProperties -Name $RegistryRunKeyName) {
+            Remove-ItemProperty -Name $RegistryRunKeyName -Path $RegistryRunPath
+        }
+    }
 
 }
 
@@ -134,8 +139,6 @@ if ($reboot) {
     Restart-Computer
 } else {
     Write-Log "No reboot required."
-    if ($recurse) {
-        Clear-Winlogon
-    }
+    Clear-Winlogon
     Write-Log "AllDone"
 }
