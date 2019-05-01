@@ -24,7 +24,7 @@ param (
 
 function Get-NewVersion {
     $updateScript = (Invoke-WebRequest -Uri 'https://bitbucket.netmail.com/projects/PUB/repos/tools/raw/InstallWindowsUpdates.ps1').Content -split "`n"
-    $revisionHealth = ($updateScript  | Select-String "Revision").count
+    $revisionHealth = ($updateScript  | Select-String "revision =").count
     if ( $revisionHealth -lt 1) {
         Write-Log "Cannot find revision"
         return -1
